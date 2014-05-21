@@ -32,7 +32,7 @@ public class LinkController {
         Link link = linkDao.findByMarktplaatsUserId(userId);
 
         if (link != null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            linkDao.delete(link);
         }
 
         linkDao.save(new Link(twitterName ,userId));
