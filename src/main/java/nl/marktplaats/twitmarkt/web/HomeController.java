@@ -27,9 +27,7 @@ package nl.marktplaats.twitmarkt.web;
 
 import java.util.Locale;
 
-import nl.marktplaats.twitmarkt.model.Link;
 import nl.marktplaats.twitmarkt.persistence.LinkDao;
-import nl.marktplaats.twitmarkt.twitter.TwitterFilterStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,17 +67,6 @@ public class HomeController {
 //        linkDao.save(new Link("joe", 2));
 
         System.out.println("worky?");
-        return "home";
-    }
-
-
-    @RequestMapping(value = "/start", method = RequestMethod.GET)
-    public String start() {
-        try {
-            new TwitterFilterStream().oauth("mhgeRyWgkpfr9NjJAeZgUROiC", "F0GlfEgpcKTgNIB3dqRp7qI9K2RE70NDl8AhLYT6Ls3ct7ydR6", "2511277645-L64hPVmzkXXz5sOQDOhysNuM2rOItbZbrLOlrib", "cgyDCqxCq5I5xpdYM4jGHtwTY5MgDJaBkQRAsFK1HmOFN");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         return "home";
     }
 }

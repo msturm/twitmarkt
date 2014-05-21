@@ -1,8 +1,14 @@
 package nl.marktplaats.twitmarkt.twitter;
 
 
+import static nl.marktplaats.twitmarkt.twitter.TwitterAuthentication.consumerKey;
+import static nl.marktplaats.twitmarkt.twitter.TwitterAuthentication.consumerSecret;
+import static nl.marktplaats.twitmarkt.twitter.TwitterAuthentication.token;
+import static nl.marktplaats.twitmarkt.twitter.TwitterAuthentication.tokenSecret;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import javax.annotation.PostConstruct;
 
 import com.google.common.collect.Lists;
 import com.twitter.hbc.ClientBuilder;
@@ -13,6 +19,7 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import nl.marktplaats.twitmarkt.TweetToAdHandler;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -20,6 +27,7 @@ import nl.marktplaats.twitmarkt.TweetToAdHandler;
  * Date: 21-05-14
  * Time: 13:35
  */
+@Component
 public class TwitterFilterStream {
 
     TweetToAdHandler handler = new TweetToAdHandler();
@@ -53,5 +61,15 @@ public class TwitterFilterStream {
 
         client.stop();
 
+    }
+
+    @PostConstruct
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("Starting stream listener");
+        try {
+            new TwitterFilterStream().oauth(consumerKey, consumerSecret, token, tokenSecret);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
