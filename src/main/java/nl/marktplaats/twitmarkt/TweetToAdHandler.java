@@ -71,7 +71,7 @@ public class TweetToAdHandler {
 
         System.out.println(item);
         String postedAd = postAd(marktplaatsUserId, item);
-        uploadImages(postedAd, images);
+        uploadImages(marktplaatsUserId, postedAd, images);
         tweetUpdate(postedAd, twitteruser, tweetId);
         System.out.println("posted ad " + postedAd);
     }
@@ -111,7 +111,8 @@ public class TweetToAdHandler {
         return obj.get("title").toString().replace("\"", "");
     }
 
-    private void uploadImages(String postedAd, List<String> images) {
+    private void uploadImages(long userId, String postedAd, List<String> images) {
+
         if (images.isEmpty()) {
             return;
         }
@@ -127,8 +128,10 @@ public class TweetToAdHandler {
         String imagesJson = "{\"urls\":[" + Joiner.on(",").join(imagesWithQuote) + "],\"replaceAll\":true}";
         System.out.println(imagesJson);
         try {
+            String token = createTokenForUser(userId);
+
             HttpPost httpPost = new HttpPost(API_URI + String.format("/advertisements/%s/images", itemId));
-            httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + ACCESS_TOKEN));
+            httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + token));
             httpPost.setEntity(new StringEntity(imagesJson, ContentType.APPLICATION_JSON));
             HttpResponse httpResponse = httpClient.execute(httpPost);
             if (httpResponse.getStatusLine().getStatusCode() == 202) {
@@ -137,6 +140,8 @@ public class TweetToAdHandler {
                 logger.error(String.format("Wrong!: status: %d, body: %s", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity())));
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (TException e) {
             e.printStackTrace();
         }
     }
