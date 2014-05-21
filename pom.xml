@@ -39,6 +39,11 @@
       <artifactId>spring-webmvc</artifactId>
       <version>${springframework.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${springframework.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -124,6 +129,20 @@
       <version>${codahale.metrics.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.21</version>
+    </dependency>
+
+    <!-- c3p0 -->
+
+    <dependency>
+      <groupId>com.mchange</groupId>
+      <artifactId>c3p0</artifactId>
+      <version>0.9.5-pre8</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -154,7 +173,7 @@
       </plugin>
 
       <!-- Pre-compiles JSPs. With pre-compiled JSPs it is not necessary to
-        shade the jar so the taglibs can be found when the JSPs are compiled at run 
+        shade the jar so the taglibs can be found when the JSPs are compiled at run
         time. -->
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
@@ -180,7 +199,7 @@
         </executions>
       </plugin>
 
-      <!-- This plugin will setup the resulting jar for direct execution. 
+      <!-- This plugin will setup the resulting jar for direct execution.
         If using a shaded jar, this is not needed. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

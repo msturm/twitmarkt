@@ -27,8 +27,11 @@ package nl.marktplaats.twitmarkt.web;
 
 import java.util.Locale;
 
+import nl.marktplaats.twitmarkt.model.Link;
+import nl.marktplaats.twitmarkt.persistence.LinkDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,9 +43,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class HomeController {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(HomeController.class);
+    private LinkDao linkDao;
 
+    private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+
+    @Autowired
+    public HomeController(LinkDao linkDao) {
+        this.linkDao = linkDao;
+    }
 
     /**
      * Simple controller for "/" that returns a JSP view.
@@ -52,6 +60,14 @@ public class HomeController {
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String home(Locale locale, Model model) {
+
+        System.out.println(linkDao.findByMarktplaatsUserId(1));
+
+        System.out.println(linkDao.findByTwitterScreenName("jelmer1980"));
+
+//        linkDao.save(new Link("joe", 2));
+
+        System.out.println("worky?");
         return "home";
     }
 

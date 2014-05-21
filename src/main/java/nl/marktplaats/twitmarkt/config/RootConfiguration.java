@@ -27,51 +27,52 @@ package nl.marktplaats.twitmarkt.config;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.stereotype.Controller;
 
-/**
- * The root application context.
- * <p/>
- * Scanning is enabled but will skip @Configuration and @Controller classes.
- *
- * @Configuration classes are skipped to prevent picking theses ones up again as
- * these files are in the scan path.  @Controller classes will be picked up by
- * MvcConfiguration.
- */
+import javax.sql.DataSource;
+
 @Configuration
 @Import({JettyConfiguration.class})
-@ComponentScan(basePackages = {"nl.marktplaats.twitmarkt"},
-        excludeFilters = {@ComponentScan.Filter(Controller.class),
-                @ComponentScan.Filter(Configuration.class)})
+@ComponentScan(basePackages = {"nl.marktplaats.twitmarkt"}, excludeFilters = {@ComponentScan.Filter(Controller.class), @ComponentScan.Filter(Configuration.class)})
 public class RootConfiguration {
 
-    /**
-     * Allows access to properties. eg) @Value("${jetty.port}").
-     */
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    /**
-     * A default Metrics registry.
-     */
     @Bean
     public MetricRegistry metricRegistry() {
         return new MetricRegistry();
     }
 
-    /**
-     * A default Health registry (part of Metrics).
-     */
     @Bean
     public HealthCheckRegistry healthCheckRegistry() {
         return new HealthCheckRegistry();
+    }
+
+    @Bean
+    public DataSource dataSource() throws Exception {
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+        dataSource.setJdbcUrl("jdbc:mysql://127.0.0.1:3306/hackathon?useUnicode=yes&characterEncoding=UTF-8");
+        dataSource.setUser("root");
+        dataSource.setPassword("root123");
+
+        return dataSource;
+    }
+
+    @Bean
+    public NamedParameterJdbcTemplate namedParameterJdbcTemplate() throws Exception {
+        return new NamedParameterJdbcTemplate(dataSource());
     }
 
 
