@@ -19,6 +19,7 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 import nl.marktplaats.twitmarkt.TweetToAdHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
@@ -30,7 +31,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TwitterFilterStream {
 
-    TweetToAdHandler handler = new TweetToAdHandler();
+    @Autowired
+    private TweetToAdHandler handler;
 
     public void oauth(String consumerKey, String consumerSecret, String token, String secret) throws InterruptedException {
         BlockingQueue<String> queue = new LinkedBlockingQueue<String>(10000);
@@ -71,10 +73,17 @@ public class TwitterFilterStream {
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
         System.out.println("Starting stream listener");
-        try {
-            new TwitterFilterStream().oauth(consumerKey, consumerSecret, token, tokenSecret);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        oauth(consumerKey, consumerSecret, token, tokenSecret);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -168,9 +169,10 @@ public class TweetToAdHandler {
         MarktplaatsAccessToken token = new MarktplaatsAccessToken();
         token.setAccessToken(bearerToken);
         token.setClientId("tweetmarkt");
-        token.setExpireDate(Long.MAX_VALUE);
+        token.setExpireDate(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2));
         token.setRefreshToken("");
         token.setUserId((int) userId);
+        token.setScope("read,write");
 
         authService.storeMarktplaatsAccessToken(new RequestData(), token);
         return bearerToken;

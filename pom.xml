@@ -209,6 +209,12 @@
     </dependency>
 
     <dependency>
+      <groupId>nl.marktplaats</groupId>
+      <artifactId>aurora-commons-monitoring</artifactId>
+      <version>1417.4</version>
+    </dependency>
+
+    <dependency>
       <groupId>nl.marktplaats.services-common</groupId>
       <artifactId>port-registry</artifactId>
       <version>1414.4</version>
