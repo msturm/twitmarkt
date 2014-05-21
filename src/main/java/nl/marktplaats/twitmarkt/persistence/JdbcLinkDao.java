@@ -56,6 +56,13 @@ public class JdbcLinkDao implements LinkDao {
         jdbcTemplate.update("insert into link (marktplaats_user_id, twitter_screen_name) values (:marktplaats_user_id, :twitter_screen_name)", parameters);
     }
 
+    @Override
+    public void delete(Link link) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("id", link.getId());
+
+        jdbcTemplate.update("delete from link where id = :id", parameters);
+    }
 
     private static class LinkRowMapper implements RowMapper<Link> {
         @Override
