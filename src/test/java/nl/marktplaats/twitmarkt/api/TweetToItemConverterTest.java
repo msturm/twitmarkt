@@ -1,7 +1,8 @@
 package nl.marktplaats.twitmarkt.api;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 
