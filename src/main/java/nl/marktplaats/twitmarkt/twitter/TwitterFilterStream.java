@@ -56,7 +56,12 @@ public class TwitterFilterStream {
         for (int msgRead = 0; msgRead < 1000; msgRead++) {
             String msg = queue.take();
             System.out.println(msg);
-            handler.doMagic(msg);
+
+            if (handler.isPostedByLinkedUser(msg)) {
+                handler.doMagic(msg);
+            } else {
+                System.out.println("This is not a user in the link table!!!");
+            }
         }
 
         client.stop();

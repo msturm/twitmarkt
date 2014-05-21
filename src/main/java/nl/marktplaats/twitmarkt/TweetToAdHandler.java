@@ -3,13 +3,19 @@ package nl.marktplaats.twitmarkt;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import nl.marktplaats.common.remoting.RequestData;
+import nl.marktplaats.shared.auth.remoting.AuthService;
+import nl.marktplaats.shared.auth.remoting.MarktplaatsAccessToken;
 import nl.marktplaats.twitmarkt.api.TweetToItemConverter;
+import nl.marktplaats.twitmarkt.model.Link;
+import nl.marktplaats.twitmarkt.persistence.LinkDao;
 import nl.marktplaats.twitmarkt.twitter.TweetRetriever;
 import nl.marktplaats.twitmarkt.twitter.TwitterUpdate;
 import org.apache.http.HttpResponse;
@@ -19,16 +25,16 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
 
-/**
- * User: msturm
- * Date: 21-05-14
- * Time: 14:18
- */
+
+@Component
 public class TweetToAdHandler {
 
     private static final String API_URI = "https://api.marktplaats.dev/v1";
@@ -38,6 +44,19 @@ public class TweetToAdHandler {
     private static final Logger logger = LoggerFactory.getLogger(TweetToAdHandler.class);
     private HttpClient httpClient = HttpClientFactory.newHttpClient();
 
+    @Autowired
+    private LinkDao linkDao;
+
+    @Autowired
+    private AuthService.Iface authService;
+
+    public boolean isPostedByLinkedUser(String rawTweet) {
+        long tweetId = getIdFromTweetJson(rawTweet);
+        Status tweet = new TweetRetriever().getTweet(tweetId);
+        String screenname = tweet.getUser().getScreenName();
+        return linkDao.findByTwitterScreenName(screenname) != null;
+    }
+
     public void doMagic(String rawTweet) {
         // first get the full tweet
         long tweetId = getIdFromTweetJson(rawTweet);
@@ -46,8 +65,11 @@ public class TweetToAdHandler {
         String item = new TweetToItemConverter().convertTweetToItem(tweet.getText());
         TwitterUser twitteruser = new TwitterUser(tweet.getUser().getScreenName(), tweet.getUser().getId());
 
+        Link link = linkDao.findByTwitterScreenName(twitteruser.screenname);
+        long marktplaatsUserId = link.getMarktplaatsUserId();
+
         System.out.println(item);
-        String postedAd = postAd(item);
+        String postedAd = postAd(marktplaatsUserId, item);
         uploadImages(postedAd, images);
         tweetUpdate(postedAd, twitteruser, tweetId);
         System.out.println("posted ad " + postedAd);
@@ -118,10 +140,13 @@ public class TweetToAdHandler {
         }
     }
 
-    private String postAd(String item) {
+    private String postAd(long userId, String item) {
         try {
+
+            String token = createTokenForUser(userId);
+
             HttpPost httpPost = new HttpPost(API_URI + "/advertisements");
-            httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + ACCESS_TOKEN));
+            httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + token));
             httpPost.setEntity(new StringEntity(item, ContentType.APPLICATION_JSON));
             HttpResponse httpResponse = httpClient.execute(httpPost);
             if (httpResponse.getStatusLine().getStatusCode() == 201) {
@@ -130,11 +155,27 @@ public class TweetToAdHandler {
                 logger.error(String.format("Wrong!: status: %d, body: %s", httpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(httpResponse.getEntity())));
                 return "";
             }
-        } catch (IOException e) {
+        } catch (IOException | TException e) {
             e.printStackTrace();
         }
         return "";
     }
+
+
+    private String createTokenForUser(long userId) throws IOException, TException {
+        String bearerToken = UUID.randomUUID().toString();
+
+        MarktplaatsAccessToken token = new MarktplaatsAccessToken();
+        token.setAccessToken(bearerToken);
+        token.setClientId("tweetmarkt");
+        token.setExpireDate(Long.MAX_VALUE);
+        token.setRefreshToken("");
+        token.setUserId((int) userId);
+
+        authService.storeMarktplaatsAccessToken(new RequestData(), token);
+        return bearerToken;
+    }
+
 
     class TwitterUser {
         public String screenname;

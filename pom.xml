@@ -187,6 +187,33 @@
       <version>0.9.5-pre8</version>
     </dependency>
 
+    <!-- Marktplaats api -->
+
+    <dependency>
+      <groupId>nl.marktplaats</groupId>
+      <artifactId>shared-properties</artifactId>
+      <version>1408.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.marktplaats</groupId>
+      <artifactId>shared-commons-thrift</artifactId>
+      <version>1418.2</version>
+      <classifier>compiled-thrift</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.marktplaats.thrift</groupId>
+      <artifactId>shared-thrift-0.9</artifactId>
+      <version>1414.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>nl.marktplaats.services-common</groupId>
+      <artifactId>port-registry</artifactId>
+      <version>1414.4</version>
+    </dependency>
+
   </dependencies>
 
   <build>

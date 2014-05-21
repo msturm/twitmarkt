@@ -28,6 +28,9 @@ package nl.marktplaats.twitmarkt.config;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import nl.marktplaats.ServiceClientFactory;
+import nl.marktplaats.properties.SharedServicesHostsProperties;
+import nl.marktplaats.shared.auth.remoting.AuthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +46,8 @@ import javax.sql.DataSource;
 @Import({JettyConfiguration.class})
 @ComponentScan(basePackages = {"nl.marktplaats.twitmarkt"}, excludeFilters = {@ComponentScan.Filter(Controller.class), @ComponentScan.Filter(Configuration.class)})
 public class RootConfiguration {
+
+    private SharedServicesHostsProperties hosts = new SharedServicesHostsProperties();
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -75,5 +80,12 @@ public class RootConfiguration {
         return new NamedParameterJdbcTemplate(dataSource());
     }
 
+
+    @Bean
+    public AuthService.Iface authService() throws Exception {
+        ServiceClientFactory factory = new ServiceClientFactory<AuthService.Iface>(AuthService.Client.class, hosts.sharedAuthServiceFe());
+        factory.afterPropertiesSet();
+        return (AuthService.Iface) factory.getObject();
+    }
 
 }
