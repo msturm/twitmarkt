@@ -25,13 +25,16 @@
 
 package nl.marktplaats.twitmarkt.config;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+
 import com.codahale.metrics.servlets.AdminServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-
-import javax.servlet.*;
 
 public class WebAppInitializer extends
         AbstractAnnotationConfigDispatcherServletInitializer implements
@@ -73,11 +76,6 @@ public class WebAppInitializer extends
 
         /* Let super do its thing... */
         super.onStartup(servletContext);
-
-        /* Add the Spring Security filter. */
-        servletContext.addFilter("springSecurityFilterChain",
-                new DelegatingFilterProxy()).addMappingForUrlPatterns(null,
-                false, "/*");
 
         // Add metrics servlet.
         ServletRegistration.Dynamic metricsServlet = servletContext.addServlet(
