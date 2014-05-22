@@ -9,11 +9,11 @@ public class Item {
     private String title;
     private String description;
     private PriceModel priceModel;
-    private int categoryId;
+    private long categoryId;
     private String conditie;
     private Location location = new Location();
 
-    public Item(String title, String description, PriceModel priceModel, int categoryId, String conditie, Location location) {
+    public Item(String title, String description, PriceModel priceModel, long categoryId, String conditie, Location location) {
         this.title = title;
         this.description = description;
         this.priceModel = priceModel;
@@ -22,7 +22,7 @@ public class Item {
         this.location = location;
     }
 
-    public Item(String title, String description, PriceModel priceModel, int categoryId, String conditie) {
+    public Item(String title, String description, PriceModel priceModel, long categoryId, String conditie) {
         this.title = title;
         this.description = description;
         this.priceModel = priceModel;
@@ -42,7 +42,7 @@ public class Item {
         return priceModel;
     }
 
-    public int getCategoryId() {
+    public long getCategoryId() {
         return categoryId;
     }
 

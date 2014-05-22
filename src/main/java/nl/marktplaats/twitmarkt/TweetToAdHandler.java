@@ -3,17 +3,21 @@ package nl.marktplaats.twitmarkt;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import nl.marktplaats.common.remoting.RequestData;
 import nl.marktplaats.shared.auth.remoting.AuthService;
 import nl.marktplaats.shared.auth.remoting.MarktplaatsAccessToken;
+import nl.marktplaats.twitmarkt.api.CategoryInfo;
+import nl.marktplaats.twitmarkt.api.RetrieveCategories;
 import nl.marktplaats.twitmarkt.api.TweetToItemConverter;
 import nl.marktplaats.twitmarkt.model.Link;
 import nl.marktplaats.twitmarkt.persistence.LinkDao;
@@ -39,11 +43,12 @@ import twitter4j.Status;
 public class TweetToAdHandler {
 
     private static final String API_URI = "https://api.marktplaats.dev/v1";
-    private static final String ACCESS_TOKEN = "zVYqrAUaNjjIc1YhgiEGDZSv3";
     private static final String MP_BASE_URL = "aurora.marktplaats.dev";
 
     private static final Logger logger = LoggerFactory.getLogger(TweetToAdHandler.class);
     private HttpClient httpClient = HttpClientFactory.newHttpClient();
+
+    private static Map<String, CategoryInfo> l2Categories = Maps.newHashMap();
 
     @Autowired
     private LinkDao linkDao;
@@ -63,11 +68,19 @@ public class TweetToAdHandler {
         long tweetId = getIdFromTweetJson(rawTweet);
         Status tweet = new TweetRetriever().getTweet(tweetId);
         List<String> images = getImagesUrlFromTweetJson(tweet);
-        String item = new TweetToItemConverter().convertTweetToItem(tweet.getText());
         TwitterUser twitteruser = new TwitterUser(tweet.getUser().getScreenName(), tweet.getUser().getId());
 
         Link link = linkDao.findByTwitterScreenName(twitteruser.screenname);
         long marktplaatsUserId = link.getMarktplaatsUserId();
+
+        if (l2Categories.isEmpty()) {
+            try {
+                l2Categories = new RetrieveCategories().retrieveL2Categories(createTokenForUser(marktplaatsUserId));
+            } catch (IOException | TException e) {
+                e.printStackTrace();
+            }
+        }
+        String item = new TweetToItemConverter().convertTweetToItem(tweet.getText(), l2Categories);
 
         System.out.println(item);
         String postedAd = postAd(marktplaatsUserId, item);

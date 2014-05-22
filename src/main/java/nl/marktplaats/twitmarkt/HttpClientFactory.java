@@ -19,7 +19,7 @@ import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.http.protocol.HttpRequestExecutor;
 
-class HttpClientFactory {
+public class HttpClientFactory {
 
     public static CloseableHttpClient newHttpClient() {
         CacheConfig cacheConfig = CacheConfig.custom()
