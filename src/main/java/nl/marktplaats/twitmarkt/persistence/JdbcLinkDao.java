@@ -64,7 +64,7 @@ public class JdbcLinkDao implements LinkDao {
         jdbcTemplate.update("delete from link where id = :id", parameters);
     }
 
-    private static class LinkRowMapper implements RowMapper<Link> {
+    private static final class LinkRowMapper implements RowMapper<Link> {
         @Override
         public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
             long id = rs.getLong("id");

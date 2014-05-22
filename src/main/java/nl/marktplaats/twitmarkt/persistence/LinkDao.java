@@ -11,6 +11,6 @@ public interface LinkDao {
 
     void save(Link link) throws DataAccessException;
 
-    void delete(Link link);
+    void delete(Link link) throws DataAccessException;
 
 }
