@@ -13,16 +13,27 @@ import com.google.gson.Gson;
 
 public class TweetToItemConverter {
     public String convertTweetToItem(String rawTweet, Map<String, CategoryInfo> l2Categories) {
-        String tweet = rawTweet.replace("\"","").replaceAll("#.*", "").trim();
-        Pattern pattern = Pattern.compile("(.*): (.*) - (.*)");
-        Matcher matcher = pattern.matcher(tweet);
-        if (matcher.find()) {
-            String category = matcher.group(1);
-            String title = matcher.group(2);
-            String description = matcher.group(3);
+        String tweet = rawTweet.replace("\"","").replaceAll("#\\w*?", "").trim();
+        Pattern pattern1 = Pattern.compile("(.*): (.*) - (.*)");
+        Matcher matcher1 = pattern1.matcher(tweet);
+        if (matcher1.find()) {
+            String category = matcher1.group(1);
+            String title = matcher1.group(2);
+            String description = matcher1.group(3);
             CategoryInfo categoryId = categoryToId(category, l2Categories);
             return objectToJson(new Item(title, description, new PriceModel(), categoryId.id, getConditieAttribute(categoryId)));
         }
+
+        Pattern pattern2 = Pattern.compile("((\\w+).*?\\.)(.*)");
+        Matcher matcher2 = pattern2.matcher(tweet);
+        if (matcher2.find()) {
+            String category = matcher2.group(2);
+            String title = matcher2.group(1).trim();
+            String description = matcher2.group(3).trim();
+            CategoryInfo categoryId = categoryToId(category, l2Categories);
+            return objectToJson(new Item(title, description, new PriceModel(), categoryId.id, getConditieAttribute(categoryId)));
+        }
+
         return null;
     }
 

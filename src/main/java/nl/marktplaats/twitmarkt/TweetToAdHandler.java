@@ -190,7 +190,7 @@ public class TweetToAdHandler {
         token.setExpireDate(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(2));
         token.setRefreshToken("");
         token.setUserId((int) userId);
-        token.setScope("read,write");
+        token.setScope("read,write,invoice_allowed");
 
         authService.storeMarktplaatsAccessToken(new RequestData(), token);
         return bearerToken;
