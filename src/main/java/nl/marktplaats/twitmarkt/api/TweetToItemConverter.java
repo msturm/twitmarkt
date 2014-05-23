@@ -13,7 +13,7 @@ import com.google.gson.Gson;
 
 public class TweetToItemConverter {
     public String convertTweetToItem(String rawTweet, Map<String, CategoryInfo> l2Categories) {
-        String tweet = rawTweet.replace("\"","").replaceAll("#\\w*?", "").trim();
+        String tweet = rawTweet.replace("\"","").replaceAll("#\\w*", "").trim();
         Pattern pattern1 = Pattern.compile("(.*): (.*) - (.*)");
         Matcher matcher1 = pattern1.matcher(tweet);
         if (matcher1.find()) {
